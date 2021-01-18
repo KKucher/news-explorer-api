@@ -1,6 +1,6 @@
 const {
   JWT_SECRET = "JWT_SECRET",
-  PORT = 3000,
+  PORT = 3001,
   MONGODB = "mongodb://localhost:27017/newsdb",
 } = process.env;
 
