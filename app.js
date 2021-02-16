@@ -6,7 +6,7 @@ const helmet = require("helmet");
 
 require("dotenv").config();
 
-const { MONGODB, PORT, allowedCors } = require("./config/config");
+const { MONGODB, PORT, corsConfig } = require("./config/config");
 const { limiter } = require("./middlewares/rateLimiter");
 const celebrateErrorHandler = require("./middlewares/celebrateValidation/celebrateErrorHandler");
 const errorHandler = require("./middlewares/errorHandler");
@@ -24,7 +24,7 @@ const router = require("./routes");
 
 const app = express();
 
-app.use(cors({ origin: allowedCors }));
+app.use(cors(corsConfig));
 
 app.use(requestLogger);
 

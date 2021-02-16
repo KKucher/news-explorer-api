@@ -4,9 +4,14 @@ const {
   MONGODB = "mongodb://localhost:27017/newsdb",
 } = process.env;
 
-const allowedCors = [
-  "http://localhost:3000",
-];
+const corsConfig = {
+  origin: [
+    "https://news-kucher.students.nomoredomains.monster/",
+    "http://news-kucher.students.nomoredomains.monster/",
+    "http://localhost:3000",
+  ],
+  credentials: true,
+};
 
 const urlRegex = /^(https?:\/\/(www\.)?)[\w-]+\.[\w./():,-]+#?$/;
 
@@ -14,6 +19,6 @@ module.exports = {
   JWT_SECRET,
   PORT,
   MONGODB,
-  allowedCors,
+  corsConfig,
   urlRegex,
 };
