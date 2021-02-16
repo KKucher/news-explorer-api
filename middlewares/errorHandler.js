@@ -11,7 +11,15 @@ const errorHandler = (err, req, res, next) => {
 
   if (err.name === "ValidationError") {
     error.statusCode = 400;
-    error.message = err.message;
+    error.message = err.message || "Неверно заполнены поля";
+  }
+  if (
+    err.name !== "ValidationError" &&
+    err.status === 400 &&
+    err.type === "cors"
+  ) {
+    error.statusCode = 400;
+    error.message = err.message || "Неверно заполнены поля";
   }
   if (err.name === "CastError") {
     error.statusCode = 422;
