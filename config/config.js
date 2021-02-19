@@ -10,6 +10,7 @@ const corsConfig = {
   origin: [
     "https://news-kucher.students.nomoredomains.monster/",
     "http://news-kucher.students.nomoredomains.monster/",
+    "http://localhost:3000",
   ],
   credentials: true,
 };
