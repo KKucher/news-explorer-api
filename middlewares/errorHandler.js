@@ -1,36 +1,19 @@
-const {
-  serverErrorMessage,
-  clientErrorMessage,
-} = require("../utils/errorsMessages");
+const { duplicateErrorMessage, serverErrorMessage, validationErrorMessage } = require('../utils/constants');
 
-const errorHandler = (err, req, res, next) => {
-  const error = {
-    statusCode: err.statusCode || 500,
-    message: err.message || serverErrorMessage.serverError,
-  };
+module.exports = ((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
 
-  if (err.name === "ValidationError") {
-    error.statusCode = 400;
-    error.message = err.message || "Неверно заполнены поля";
+  if (err.name === 'CastError' || err.name === 'ValidationError') {
+    res.status(400).send({ message: validationErrorMessage });
+    return;
   }
-  if (
-    err.name !== "ValidationError" &&
-    err.status === 400 &&
-    err.type === "cors"
-  ) {
-    error.statusCode = 400;
-    error.message = err.message || "Неверно заполнены поля";
+
+  if (err.name === 'MongoError' && err.code === 11000) {
+    res.status(409).send({ message: duplicateErrorMessage });
+    return;
   }
-  if (err.name === "CastError") {
-    error.statusCode = 422;
-    error.message = clientErrorMessage.castError;
-  }
-  if (err.name === "DisconnectedError") {
-    error.statusCode = 503;
-    error.message = serverErrorMessage.disconnectedError;
-  }
-  res.status(error.statusCode).send({ message: error.message });
+
+  res.status(statusCode).send({ message: statusCode === 500 ? serverErrorMessage : message });
+
   next();
-};
-
-module.exports = errorHandler;
+});

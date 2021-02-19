@@ -1,67 +1,53 @@
-const mongoose = require("mongoose");
-
-const { urlRegex } = require("../config/config");
-const {
-  requiredTrue,
-  linkErrorMessage,
-  castTypeMessage,
-} = require("../utils/validatonMessages");
+const mongoose = require('mongoose');
+const isURL = require('validator/lib/isURL');
 
 const articleSchema = new mongoose.Schema({
   keyword: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Поле "keyword" должно быть заполнено'],
   },
   title: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Поле "title" должно быть заполнено'],
   },
   text: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Поле "text" должно быть заполнено'],
   },
   date: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Поле "date" должно быть заполнено'],
   },
   source: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Поле "source" должно быть заполнено'],
   },
   link: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Поле "link" должно быть заполнено'],
     validate: {
-      validator(v) {
-        return urlRegex.test(v);
-      },
-      message: linkErrorMessage,
+      validator: (v) => isURL(v),
+      message: 'Неправильный формат ссылки',
     },
   },
   image: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Поле "image" должно быть заполнено'],
     validate: {
-      validator(v) {
-        return urlRegex.test(v);
-      },
-      message: linkErrorMessage,
+      validator: (v) => isURL(v),
+      message: 'Неправильный формат ссылки',
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
-    cast: castTypeMessage,
-    required: requiredTrue,
+    ref: 'user',
+    required: true,
     select: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
-module.exports = mongoose.model("article", articleSchema);
+module.exports = mongoose.model('article', articleSchema);
