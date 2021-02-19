@@ -1,28 +1,26 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const helmet = require("helmet");
+require('dotenv-flow').config();
+const cors = require('cors');
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 
-require("dotenv").config();
-
-const { MONGODB, PORT, corsConfig } = require("./config/config");
+const errorHandler = require('./middlewares/errorHandler');
+const router = require('./routes');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { PORT, MONGO_URL, corsConfig } = require('./config/config');
 const { limiter } = require("./middlewares/rateLimiter");
-const celebrateErrorHandler = require("./middlewares/celebrateValidation/celebrateErrorHandler");
-const errorHandler = require("./middlewares/errorHandler");
-const { serverErrorMessage } = require("./utils/errorsMessages");
-const { requestLogger, errorLogger } = require("./middlewares/logger");
 
-mongoose.connect(MONGODB, {
+const app = express();
+
+mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-
-const router = require("./routes");
-
-const app = express();
 
 app.use(cors(corsConfig));
 
@@ -33,17 +31,12 @@ app.use(helmet());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get("/crash-test", () => {
-  setTimeout(() => {
-    throw new Error(serverErrorMessage.serverFallError);
-  }, 0);
-});
+app.use(cookieParser());
 
 app.use("/", router);
 
 app.use(errorLogger);
-app.use(celebrateErrorHandler);
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {

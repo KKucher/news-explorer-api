@@ -1,56 +1,47 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const isEmail = require("validator/lib/isEmail");
-
-const { UnauthError } = require("../errors");
-const { requiredTrue, castTypeMessage } = require("../utils/validatonMessages");
-const { clientErrorMessage } = require("../utils/errorsMessages");
+const mongoose = require('mongoose');
+const validator = require('validator');
+const { cryptCompare } = require('../utils/crypt');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const { authorizedErrorMessage } = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    unique: true,
-    cast: castTypeMessage,
-    required: requiredTrue,
+    required: [true, 'Необходимо ввести email'],
+    unique: [true, 'Пользователь с такой почтой уже зарегестрирован'],
     validate: {
-      validator: (v) => isEmail(v),
-      message: clientErrorMessage.incorrectEmail,
+      validator: (v) => validator.isEmail(v),
+      message: 'Неправильный формат почты',
     },
   },
   password: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
-    minlength: 8,
+    required: [true, 'Необходимо ввести пароль'],
+    minlength: [8, 'Минимальная длина пароля - 8 символов'],
     select: false,
+    validate: {
+      validator: (v) => /^\S+$/.test(v),
+      message: 'Недопустимый символ в пароле',
+    },
   },
   name: {
     type: String,
-    cast: castTypeMessage,
-    required: requiredTrue,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Минимальная длина поля "name" - 2 символа'],
+    maxlength: [30, 'Максимальная длина поля "name" - 30 символов'],
   },
 });
 
-function findUserByCredentials(email, password) {
-  return this.findOne({ email })
-    .select("+password")
-    .then((user) => {
-      if (!user) {
-        throw new UnauthError(clientErrorMessage.emailOrPasswordError);
-      }
-
-      return bcrypt.compare(password, user.password).then((matched) => {
+userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {
+  return this.findOne({ email }).select('+password')
+    .orFail(new UnauthorizedError(authorizedErrorMessage))
+    .then((user) => cryptCompare(password, user.password)
+      .then((matched) => {
         if (!matched) {
-          throw new UnauthError(clientErrorMessage.emailOrPasswordError);
+          throw new UnauthorizedError(authorizedErrorMessage);
         }
 
         return user;
-      });
-    });
-}
+      }));
+};
 
-userSchema.statics.findUserByCredentials = findUserByCredentials;
-
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model('user', userSchema);

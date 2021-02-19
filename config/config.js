@@ -1,7 +1,9 @@
 const {
-  JWT_SECRET = "JWT_SECRET",
   PORT = 3001,
-  MONGODB = "mongodb://localhost:27017/newsdb",
+  JWT_SECRET = "JWT_SECRET",
+  MONGO_URL = "mongodb://localhost:27017/newsdb",
+  COOKIES_SECURE = false,
+  COOKIES_SAMESITE = "Lax",
 } = process.env;
 
 const corsConfig = {
@@ -13,12 +15,11 @@ const corsConfig = {
   credentials: true,
 };
 
-const urlRegex = /^(https?:\/\/(www\.)?)[\w-]+\.[\w./():,-]+#?$/;
-
 module.exports = {
-  JWT_SECRET,
   PORT,
-  MONGODB,
+  JWT_SECRET,
+  MONGO_URL,
+  COOKIES_SECURE,
+  COOKIES_SAMESITE,
   corsConfig,
-  urlRegex,
 };

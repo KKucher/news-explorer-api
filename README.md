@@ -1,7 +1,7 @@
 # Проект "News Explorer" (backend) #
 
 Backend для дипломного проекта "News Explorer".
-  
+
 **Технологии**
 
 * JavaScript;
@@ -12,9 +12,9 @@ Backend для дипломного проекта "News Explorer".
 
 **Ссылка на API**
 
-https://api.kkucher92-news-explorer.students.nomoredomains.monster/
+https://api.news-kucher.students.nomoredomains.monster/
 
 
 **Публичный IPv4**
 
-178.154.231.251
+84.201.130.208

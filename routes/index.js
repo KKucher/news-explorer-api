@@ -1,22 +1,23 @@
-const router = require("express").Router();
-const usersRouter = require("./users");
-const articlesRouter = require("./articles");
+const router = require('express').Router();
+const userRouter = require('./users');
+const articleRouter = require('./articles');
+const auth = require('../middlewares/auth');
+const { register, login, logout } = require('../controllers/users');
+const { validateLoginBody, validateRegisterBody } = require('../middlewares/validations');
+const { notFoundErrorMessage } = require('../utils/constants');
 
-const { login, createUser } = require("../controllers/users.js");
-const { validateUser, validateUserRegister } = require("../middlewares/celebrateValidation/celebrateValidation");
-const { NotFoundError } = require("../errors");
-const { clientErrorMessage } = require("../utils/errorsMessages");
+router.post('/signin', validateLoginBody, login);
+router.post('/signup', validateRegisterBody, register);
 
-const auth = require("../middlewares/auth");
+router.use(auth);
 
-router.post("/signup", validateUserRegister, createUser);
-router.post("/signin", validateUser, login);
+router.use('/users', userRouter);
+router.use('/articles', articleRouter);
 
-router.use("/articles", auth, articlesRouter);
-router.use("/users", auth, usersRouter);
+router.use('/logout', logout);
 
-router.use("*", (res, req, next) => {
-  next(new NotFoundError(clientErrorMessage.notFoundRes));
+router.use('*', (req, res) => {
+  res.status(404).send({ message: notFoundErrorMessage });
 });
 
 module.exports = router;
