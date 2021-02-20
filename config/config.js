@@ -3,13 +3,13 @@ const {
   JWT_SECRET = "JWT_SECRET",
   MONGO_URL = "mongodb://localhost:27017/newsdb",
   COOKIES_SECURE = false,
-  COOKIES_SAMESITE = "Lax",
+  COOKIES_SAMESITE = "None",
 } = process.env;
 
 const corsConfig = {
   origin: [
-    "https://news-kucher.students.nomoredomains.monster/",
-    "http://news-kucher.students.nomoredomains.monster/",
+    "https://news-kucher.students.nomoredomains.monster",
+    "http://news-kucher.students.nomoredomains.monster",
     "http://localhost:3000",
   ],
   credentials: true,
